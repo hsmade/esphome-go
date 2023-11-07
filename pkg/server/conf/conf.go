@@ -1,10 +1,9 @@
 package conf
 
 type Config struct {
-	//Name string
 	VerifyPasswordCallback func(string) bool
 	DeviceInfo             DeviceInfo
-	// sensors []Sensor // interface?
+	Sensors                []Sensor
 }
 
 type DeviceInfo struct {
