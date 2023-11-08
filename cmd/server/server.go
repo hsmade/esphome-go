@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/hsmade/esphome-go/pkg/server"
 	"github.com/hsmade/esphome-go/pkg/server/conf"
-	"github.com/hsmade/esphome-go/protobuf/api"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"log/slog"
 	"math/rand"
@@ -23,7 +22,7 @@ func main() {
 	go http.ListenAndServe(":9001", nil)
 
 	// define a binary sensor
-	binarySensorExample := api.ListEntitiesBinarySensorResponse{}
+	//binarySensorExample := api.ListEntitiesBinarySensorResponse{}
 
 	// define server object and config
 	S := server.Server{
@@ -37,8 +36,10 @@ func main() {
 				// password checking logic goes here
 				return true
 			},
-			Sensors: []conf.SensorDefinition{
-				&binarySensorExample,
+			Sensors: []conf.Sensor{
+				conf.Sensor{
+					Definition: conf.BinarySensorDefinition{},
+				},
 			},
 		},
 	}
