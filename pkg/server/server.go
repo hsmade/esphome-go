@@ -22,21 +22,9 @@ var (
 		Help: "The total number of connections handled",
 	})
 
-	promFrameReadFailuresTotal = promauto.NewCounter(prometheus.CounterOpts{
-		Name: "esphome_go_frame_read_failures_total",
-		Help: "The total number of failures when reading frames",
-	})
-
-	promFramesReceived = promauto.NewCounterVec(prometheus.CounterOpts{
-		Name: "esphome_go_frames_received_total",
-		Help: "The total amount of frames received",
-	},
-		[]string{"message_type"},
-	)
-
-	promFrameeHandleFailures = promauto.NewCounterVec(prometheus.CounterOpts{
-		Name: "esphome_go_frames_handle_failures_total",
-		Help: "The total amount of failures when handling frames",
+	promMessageHandleFailures = promauto.NewCounterVec(prometheus.CounterOpts{
+		Name: "esphome_go_message_handle_failures_total",
+		Help: "The total amount of failures when handling messages",
 	},
 		[]string{"message_type"},
 	)
@@ -71,7 +59,7 @@ func (S *Server) handleConnection(conn net.Conn) {
 		_ = conn.SetReadDeadline(time.Now().Add(time.Second * 1))
 		frame, err := frames.Read(conn)
 		if err != nil {
-			if err == io.EOF {
+			if errors.Is(err, io.EOF) {
 				_ = conn.Close()
 				return
 			}
@@ -79,10 +67,8 @@ func (S *Server) handleConnection(conn net.Conn) {
 				continue
 			}
 			slog.Error("failed reading frame: %w", err)
-			promFrameReadFailuresTotal.Inc()
 			continue
 		}
-		promFramesReceived.WithLabelValues(frame.MsgType.String()).Inc()
 
 		switch frame.MsgType {
 		case protobuf.HelloRequestType:
@@ -102,7 +88,7 @@ func (S *Server) handleConnection(conn net.Conn) {
 		}
 		if err != nil {
 			slog.Error("failed handling message: %w", err)
-			promFrameeHandleFailures.WithLabelValues(frame.MsgType.String()).Inc()
+			promMessageHandleFailures.WithLabelValues(frame.MsgType.String()).Inc()
 			continue
 		}
 

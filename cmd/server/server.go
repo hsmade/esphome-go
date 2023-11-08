@@ -22,7 +22,25 @@ func main() {
 	go http.ListenAndServe(":9001", nil)
 
 	// define a binary sensor
-	//binarySensorExample := api.ListEntitiesBinarySensorResponse{}
+	binarySensorExampleUpdates := make(chan conf.SensorUpdate, 1) // 1 to not block when we send to this below
+	binarySensorExample := conf.Sensor{
+		Definition: conf.BinarySensorDefinition{
+			BaseSensorDefinition: conf.BaseSensorDefinition{
+				ObjectId: "test",
+				Key:      1,
+				Name:     "test",
+				UniqueId: "test",
+			},
+		},
+		Updates: binarySensorExampleUpdates,
+	}
+	binarySensorExampleUpdates <- conf.BinarySensorState{
+		BaseSensorState: conf.BaseSensorState{
+			Key:          1,
+			MissingState: false,
+		},
+		State: true,
+	}
 
 	// define server object and config
 	S := server.Server{
@@ -37,9 +55,7 @@ func main() {
 				return true
 			},
 			Sensors: []conf.Sensor{
-				conf.Sensor{
-					Definition: conf.BinarySensorDefinition{},
-				},
+				binarySensorExample,
 			},
 		},
 	}

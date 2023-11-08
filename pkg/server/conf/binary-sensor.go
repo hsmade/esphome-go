@@ -1,6 +1,9 @@
 package conf
 
-import "github.com/hsmade/esphome-go/protobuf/api"
+import (
+	"github.com/hsmade/esphome-go/protobuf"
+	"github.com/hsmade/esphome-go/protobuf/api"
+)
 
 type BinarySensorDefinition struct {
 	BaseSensorDefinition
@@ -11,7 +14,7 @@ type BinarySensorDefinition struct {
 	EntityCategory       api.EntityCategory `json:"entity_category,omitempty"`
 }
 
-func (B BinarySensorDefinition) toResponse() ListEntitiesApiResponse {
+func (B BinarySensorDefinition) ToResponse() ListEntitiesApiResponse {
 	return &api.ListEntitiesBinarySensorResponse{
 		ObjectId:             B.ObjectId,
 		Key:                  B.Key,
@@ -26,11 +29,18 @@ func (B BinarySensorDefinition) toResponse() ListEntitiesApiResponse {
 }
 
 type BinarySensorState struct {
+	BaseSensorState
 	State bool
 }
 
-func (B BinarySensorState) toResponse() api.BinarySensorStateResponse {
-	return api.BinarySensorStateResponse{
-		State: B.State,
+func (B BinarySensorState) ToResponse() StateApiResponse {
+	return &api.BinarySensorStateResponse{
+		Key:          B.Key,
+		State:        B.State,
+		MissingState: B.MissingState,
 	}
+}
+
+func (B BinarySensorState) GetResponseType() protobuf.MsgType {
+	return protobuf.ListEntitiesBinarySensorResponseType
 }

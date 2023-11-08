@@ -8,6 +8,7 @@ import (
 	"github.com/hsmade/esphome-go/protobuf"
 	"github.com/hsmade/esphome-go/protobuf/api"
 	"google.golang.org/protobuf/proto"
+	"log/slog"
 	"net"
 )
 
@@ -31,6 +32,20 @@ func (H ListEntities) Respond(conn net.Conn, config conf.Config) error {
 	}
 
 	// FIXME: loop over sensors
+	slog.Debug("ListEntities:Respond: sending sensors", "amount", len(config.Sensors))
+	for _, sensor := range config.Sensors {
+		response := sensor.Definition.ToResponse()
+		data, err := proto.Marshal(response)
+		if err != nil {
+			return fmt.Errorf("handleListEntities: marshalling sensor `%s`: %w", response.GetName(), err)
+		}
+
+		slog.Debug("ListEntities:Respond: sensing sensor", "sensor", response.String())
+		err = frames.Write(data, sensor.Definition.GetResponseType(), conn)
+		if err != nil {
+			return fmt.Errorf("failed sending ListEntitiesResponse: %w", err)
+		}
+	}
 
 	response := api.ListEntitiesDoneResponse{}
 	data, err := proto.Marshal(&response)

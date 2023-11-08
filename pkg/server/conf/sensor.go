@@ -1,6 +1,7 @@
 package conf
 
 import (
+	"github.com/hsmade/esphome-go/protobuf"
 	"github.com/hsmade/esphome-go/protobuf/api"
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
@@ -14,7 +15,8 @@ type Sensor struct {
 }
 
 type SensorDefinition interface {
-	toResponse() ListEntitiesApiResponse
+	ToResponse() ListEntitiesApiResponse
+	GetResponseType() protobuf.MsgType
 }
 
 // ListEntitiesApiResponse describes the minimal interface for ListEntitiesXxxxxSensorResponse objects
@@ -32,21 +34,25 @@ type ListEntitiesApiResponse interface {
 }
 
 type BaseSensorDefinition struct {
-	ObjectId string `json:"object_id,omitempty"`
-	Key      uint32 `json:"key,omitempty"`
-	Name     string `json:"name,omitempty"`
-	UniqueId string `json:"unique_id,omitempty"`
-	Icon     string `json:"icon,omitempty"`
+	ObjectId string
+	Key      uint32
+	Name     string
+	UniqueId string
+	Icon     string
 }
 
-// toResponse is used to create an api response struct out of the sensor data
+// ToResponse is used to create an api response struct out of the sensor data
 // This implementation is just a stub/example, to satisfy the interface. Sensor structs need to define their own
-func (B BaseSensorDefinition) toResponse() api.ListEntitiesBinarySensorResponse {
+func (B BaseSensorDefinition) ToResponse() api.ListEntitiesBinarySensorResponse {
 	return api.ListEntitiesBinarySensorResponse{}
 }
 
+func (B BaseSensorDefinition) GetResponseType() protobuf.MsgType {
+	return protobuf.ListEntitiesBinarySensorResponseType
+}
+
 type SensorUpdate interface {
-	toResponse() StateApiResponse
+	ToResponse() StateApiResponse
 }
 
 type StateApiResponse interface {
@@ -56,7 +62,7 @@ type StateApiResponse interface {
 	ProtoReflect() protoreflect.Message
 	Descriptor() ([]byte, []int)
 	GetKey() uint32
-	GetState() interface{}
+	//GetState() interface{}
 	GetMissingState() bool
 }
 
