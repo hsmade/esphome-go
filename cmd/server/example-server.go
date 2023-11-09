@@ -8,6 +8,7 @@ import (
 	"math/rand"
 	"net/http"
 	"os"
+	"time"
 )
 
 func main() {
@@ -22,7 +23,6 @@ func main() {
 	go http.ListenAndServe(":9001", nil)
 
 	// define a binary sensor
-	binarySensorExampleUpdates := make(chan conf.SensorUpdate, 1) // 1 to not block when we send to this below
 	binarySensorExample := conf.Sensor{
 		Definition: conf.BinarySensorDefinition{
 			BaseSensorDefinition: conf.BaseSensorDefinition{
@@ -32,17 +32,10 @@ func main() {
 				UniqueId: "test",
 			},
 		},
-		Updates: binarySensorExampleUpdates,
-	}
-	binarySensorExampleUpdates <- conf.BinarySensorState{
-		BaseSensorState: conf.BaseSensorState{
-			Key:          1,
-			MissingState: false,
-		},
-		State: true,
 	}
 
 	// define server object and config
+	binarySensorExampleUpdates := make(chan conf.SensorUpdate, 1)
 	S := server.Server{
 		Port: 6053,
 		Config: conf.Config{
@@ -50,6 +43,7 @@ func main() {
 				Name:         "foobar",
 				UsesPassword: true,
 			},
+			Updates: binarySensorExampleUpdates,
 			VerifyPasswordCallback: func(s string) bool {
 				// password checking logic goes here
 				return true
@@ -64,11 +58,24 @@ func main() {
 	go func() {
 		err := S.Listen()
 		if err != nil {
-			slog.Error("server exited: %w", err)
+			slog.Error("main: server exited: %w", err)
 		}
 	}()
 
+	time.Sleep(5 * time.Second)
+	// send an update to a sensor
+	tick := time.NewTicker(time.Second * 5)
 	for {
-		_ = rand.Intn(1) == 1 // randomly set the binary sensor's value
+		select {
+		case <-tick.C:
+			slog.Info("main: sending update for binary sensor")
+			binarySensorExampleUpdates <- conf.BinarySensorState{
+				BaseSensorState: conf.BaseSensorState{
+					Key:          uint32(rand.Intn(1)),
+					MissingState: false,
+				},
+				State: true,
+			}
+		}
 	}
 }

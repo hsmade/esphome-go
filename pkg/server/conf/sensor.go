@@ -6,12 +6,8 @@ import (
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
-// FIXME: how to expose / ingest sensors and their values?
-
 type Sensor struct {
 	Definition SensorDefinition
-	Updates    chan SensorUpdate
-	Commands   chan SensorCommand
 }
 
 type SensorDefinition interface {
@@ -52,7 +48,7 @@ func (B BaseSensorDefinition) GetResponseType() protobuf.MsgType {
 }
 
 type SensorUpdate interface {
-	ToResponse() StateApiResponse
+	ToFrame() ([]byte, protobuf.MsgType, error)
 }
 
 type StateApiResponse interface {
@@ -71,10 +67,10 @@ type BaseSensorState struct {
 	MissingState bool
 }
 
-// toResponse is used to create an api state response struct out of the sensor state
+// ToFrame is used to create an api state frame out of the sensor state
 // This implementation is just a stub/example, to satisfy the interface. Sensor structs need to define their own
-func (S BaseSensorState) toResponse() api.BinarySensorStateResponse {
-	return api.BinarySensorStateResponse{}
+func (S BaseSensorState) ToFrame() ([]byte, protobuf.MsgType, error) {
+	return nil, 0, nil
 }
 
 type SensorCommand interface {

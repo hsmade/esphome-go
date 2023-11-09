@@ -40,7 +40,7 @@ func (H ListEntities) Respond(conn net.Conn, config conf.Config) error {
 			return fmt.Errorf("handleListEntities: marshalling sensor `%s`: %w", response.GetName(), err)
 		}
 
-		slog.Debug("ListEntities:Respond: sensing sensor", "sensor", response.String())
+		slog.Debug("ListEntities:Respond: sending sensor", "sensor", response.String())
 		err = frames.Write(data, sensor.Definition.GetResponseType(), conn)
 		if err != nil {
 			return fmt.Errorf("failed sending ListEntitiesResponse: %w", err)

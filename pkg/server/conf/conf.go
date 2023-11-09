@@ -4,6 +4,8 @@ type Config struct {
 	VerifyPasswordCallback func(string) bool
 	DeviceInfo             DeviceInfo
 	Sensors                []Sensor
+	Updates                chan SensorUpdate
+	//Commands               chan SensorCommand
 }
 
 type DeviceInfo struct {

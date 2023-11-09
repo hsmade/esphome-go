@@ -5,6 +5,7 @@ import "fmt"
 type MsgType uint32
 
 const (
+	InvalidType                               MsgType = 0
 	HelloRequestType                          MsgType = 1
 	HelloResponseType                         MsgType = 2
 	ConnectRequestType                        MsgType = 3
@@ -19,14 +20,23 @@ const (
 	ListEntitiesRequestType                   MsgType = 11
 	ListEntitiesDoneResponseType              MsgType = 19
 	SubscribeStatesRequestType                MsgType = 20
+	BinarySensorStateResponseType             MsgType = 21
 	SubscribeHomeassistantServicesRequestType MsgType = 34
+	HomeassistantServiceResponseType          MsgType = 35
 	SubscribeHomeAssistantStatesRequestType   MsgType = 38
-
-	// 20, 34, 38
+	SubscribeHomeAssistantStateResponseType   MsgType = 39
+	HomeAssistantStateResponseType            MsgType = 40
+	ListEntitiesServicesResponseType          MsgType = 41
+	ExecuteServiceRequestType                 MsgType = 42
+	ListEntitiesCameraResponseType            MsgType = 43
+	CameraImageResponseType                   MsgType = 44
+	CameraImageRequestType                    MsgType = 45
 )
 
 func (M MsgType) String() string {
 	switch M {
+	case 0:
+		return "Invalid"
 	case 1:
 		return "HelloRequest"
 	case 2:
@@ -55,10 +65,28 @@ func (M MsgType) String() string {
 		return "ListEntitiesDoneResponse"
 	case 20:
 		return "SubscribeStatesRequest"
+	case 21:
+		return "BinarySensorStateResponse"
 	case 34:
 		return "SubscribeHomeassistantServicesRequest"
+	case 35:
+		return "HomeassistantServiceResponse"
 	case 38:
 		return "SubscribeHomeAssistantStatesRequest"
+	case 39:
+		return "SubscribeHomeAssistantStateResponse"
+	case 40:
+		return "HomeAssistantStateResponse"
+	case 41:
+		return "ListEntitiesServicesResponse"
+	case 42:
+		return "ExecuteServiceRequest"
+	case 43:
+		return "ListEntitiesCameraResponse"
+	case 44:
+		return "CameraImageResponse"
+	case 45:
+		return "CameraImageRequest"
 
 	}
 	return fmt.Sprintf("unknown:%d", M)

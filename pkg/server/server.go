@@ -9,6 +9,7 @@ import (
 	"github.com/hsmade/esphome-go/protobuf"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
+	"internal/poll"
 	"io"
 	"log/slog"
 	"net"
@@ -31,8 +32,9 @@ var (
 )
 
 type Server struct {
-	Port   int
-	Config conf.Config
+	Port        int
+	Config      conf.Config
+	Subscribers []net.Conn
 }
 
 func (S *Server) Listen() error {
@@ -43,6 +45,8 @@ func (S *Server) Listen() error {
 	}
 	defer l.Close()
 
+	go S.informSubscribers()
+
 	for {
 		conn, err := l.Accept()
 		if err != nil {
@@ -52,8 +56,37 @@ func (S *Server) Listen() error {
 	}
 }
 
+func (S *Server) informSubscribers() {
+	for {
+		select {
+		case message := <-S.Config.Updates:
+			slog.Debug("Server:informSubscribers: received update message", "message", fmt.Sprintf("%+v", message))
+			data, msgType, err := message.ToFrame()
+			if err != nil {
+				slog.Error("generating frame for message", "message", fmt.Sprintf("%+v", message), "error", err)
+			}
+			var newSubscribers []net.Conn
+			for _, conn := range S.Subscribers {
+				slog.Debug("Server:informSubscribers sending update", "remote", conn.RemoteAddr().String())
+				err := frames.Write(data, msgType, conn)
+				if errors.Is(err, io.EOF) || errors.Is(err, poll.ErrNetClosing) {
+					slog.Debug("Server:informSubscribers connection closed", "remote", conn.RemoteAddr().String())
+					continue // skip to next, so we don't add back to the list
+				}
+				if err != nil {
+					slog.Error("Server:informSubscribers failed sending update", "remote", conn.RemoteAddr().String(), "error", err.Error())
+					// we do add the connection back to the list, in case this error was temporary
+				}
+				newSubscribers = append(newSubscribers, conn)
+			}
+			S.Subscribers = newSubscribers
+		}
+	}
+}
+
 func (S *Server) handleConnection(conn net.Conn) {
 	promConnectionsTotal.Inc()
+
 	// FIXME: set up pinger, needs to know when last message was received
 	for {
 		_ = conn.SetReadDeadline(time.Now().Add(time.Second * 1))
@@ -85,13 +118,16 @@ func (S *Server) handleConnection(conn net.Conn) {
 			err = messages.DeviceInfoRequest(frame).Respond(conn, S.Config)
 		case protobuf.ListEntitiesRequestType:
 			err = messages.ListEntitiesRequest(frame).Respond(conn, S.Config)
+		case protobuf.SubscribeStatesRequestType:
+			slog.Info("adding new subscriber", "remote", conn.RemoteAddr().String())
+			S.Subscribers = append(S.Subscribers, conn) // FIXME: locking!!
+		default:
+			slog.Warn("Server:handleConnection: not handling message", "type", frame.MsgType.String())
 		}
 		if err != nil {
 			slog.Error("failed handling message: %w", err)
 			promMessageHandleFailures.WithLabelValues(frame.MsgType.String()).Inc()
 			continue
 		}
-
 	}
-
 }
