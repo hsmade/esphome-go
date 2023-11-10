@@ -4,6 +4,7 @@ import (
 	"github.com/hsmade/esphome-go/pkg/server"
 	"github.com/hsmade/esphome-go/pkg/server/conf"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"hash/fnv"
 	"log/slog"
 	"math/rand"
 	"net/http"
@@ -22,12 +23,17 @@ func main() {
 	http.Handle("/metrics", promhttp.Handler())
 	go http.ListenAndServe(":9001", nil)
 
+	// we need a key for our sensor
+	key := fnv.New32()
+	_, _ = key.Write([]byte("test")) // name of sensor
+	keySum := key.Sum32()
+
 	// define a binary sensor
 	binarySensorExample := conf.Sensor{
 		Definition: conf.BinarySensorDefinition{
 			BaseSensorDefinition: conf.BaseSensorDefinition{
 				ObjectId: "test",
-				Key:      1,
+				Key:      keySum,
 				Name:     "test",
 				UniqueId: "test",
 			},
@@ -71,10 +77,10 @@ func main() {
 			slog.Info("main: sending update for binary sensor")
 			binarySensorExampleUpdates <- conf.BinarySensorState{
 				BaseSensorState: conf.BaseSensorState{
-					Key:          uint32(rand.Intn(1)),
+					Key:          keySum,
 					MissingState: false,
 				},
-				State: true,
+				State: rand.Intn(2) == 1, // randomly on/off
 			}
 		}
 	}

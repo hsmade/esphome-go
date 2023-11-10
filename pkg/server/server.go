@@ -9,7 +9,6 @@ import (
 	"github.com/hsmade/esphome-go/protobuf"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
-	"internal/poll"
 	"io"
 	"log/slog"
 	"net"
@@ -69,9 +68,10 @@ func (S *Server) informSubscribers() {
 			for _, conn := range S.Subscribers {
 				slog.Debug("Server:informSubscribers sending update", "remote", conn.RemoteAddr().String())
 				err := frames.Write(data, msgType, conn)
-				if errors.Is(err, io.EOF) || errors.Is(err, poll.ErrNetClosing) {
+				var opError *net.OpError
+				if errors.As(err, &opError) || errors.Is(err, io.EOF) {
 					slog.Debug("Server:informSubscribers connection closed", "remote", conn.RemoteAddr().String())
-					continue // skip to next, so we don't add back to the list
+					continue
 				}
 				if err != nil {
 					slog.Error("Server:informSubscribers failed sending update", "remote", conn.RemoteAddr().String(), "error", err.Error())
