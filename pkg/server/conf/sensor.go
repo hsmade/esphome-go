@@ -2,7 +2,6 @@ package conf
 
 import (
 	"github.com/hsmade/esphome-go/protobuf"
-	"github.com/hsmade/esphome-go/protobuf/api"
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
@@ -37,15 +36,15 @@ type BaseSensorDefinition struct {
 	Icon     string
 }
 
-// ToResponse is used to create an api response struct out of the sensor data
-// This implementation is just a stub/example, to satisfy the interface. Sensor structs need to define their own
-func (B BaseSensorDefinition) ToResponse() api.ListEntitiesBinarySensorResponse {
-	return api.ListEntitiesBinarySensorResponse{}
-}
-
-func (B BaseSensorDefinition) GetResponseType() protobuf.MsgType {
-	return protobuf.ListEntitiesBinarySensorResponseType
-}
+//// ToResponse is used to create an api response struct out of the sensor data
+//// This implementation is just a stub/example, to satisfy the interface. Sensor structs need to define their own
+//func (B BaseSensorDefinition) ToResponse() api.ListEntitiesBinarySensorResponse {
+//	return api.ListEntitiesBinarySensorResponse{}
+//}
+//
+//func (B BaseSensorDefinition) GetResponseType() protobuf.MsgType {
+//	return protobuf.ListEntitiesBinarySensorResponseType
+//}
 
 type SensorUpdate interface {
 	ToFrame() ([]byte, protobuf.MsgType, error)
@@ -67,11 +66,11 @@ type BaseSensorState struct {
 	MissingState bool
 }
 
-// ToFrame is used to create an api state frame out of the sensor state
-// This implementation is just a stub/example, to satisfy the interface. Sensor structs need to define their own
-func (S BaseSensorState) ToFrame() ([]byte, protobuf.MsgType, error) {
-	return nil, 0, nil
-}
+//// ToFrame is used to create an api state frame out of the sensor state
+//// This implementation is just a stub/example, to satisfy the interface. Sensor structs need to define their own
+//func (S BaseSensorState) ToFrame() ([]byte, protobuf.MsgType, error) {
+//	return nil, 0, nil
+//}
 
 type SensorCommand interface {
 	toCommand() CommandApiCommand
@@ -94,8 +93,8 @@ type BaseSensorCommand struct {
 	State    bool
 }
 
-// toCommand is used to create an api command request struct out of the sensor command
-// This implementation is just a stub/example, to satisfy the interface. Sensor structs need to define their own
-func (S BaseSensorState) toCommand() api.LightCommandRequest {
-	return api.LightCommandRequest{}
-}
+//// toCommand is used to create an api command request struct out of the sensor command
+//// This implementation is just a stub/example, to satisfy the interface. Sensor structs need to define their own
+//func (S BaseSensorState) toCommand() api.LightCommandRequest {
+//	return api.LightCommandRequest{}
+//}

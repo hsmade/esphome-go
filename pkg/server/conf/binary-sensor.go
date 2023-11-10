@@ -1,5 +1,7 @@
 package conf
 
+// https://www.home-assistant.io/integrations/binary_sensor/
+
 import (
 	"fmt"
 	"github.com/hsmade/esphome-go/protobuf"
@@ -10,11 +12,10 @@ import (
 
 type BinarySensorDefinition struct {
 	BaseSensorDefinition
-	DeviceClass          string             `json:"device_class,omitempty"`
-	IsStatusBinarySensor bool               `json:"is_status_binary_sensor,omitempty"`
-	DisabledByDefault    bool               `json:"disabled_by_default,omitempty"`
-	Icon                 string             `json:"icon,omitempty"`
-	EntityCategory       api.EntityCategory `json:"entity_category,omitempty"`
+	DeviceClass          string
+	IsStatusBinarySensor bool
+	DisabledByDefault    bool
+	EntityCategory       api.EntityCategory
 }
 
 func (B BinarySensorDefinition) ToResponse() ListEntitiesApiResponse {
@@ -29,6 +30,10 @@ func (B BinarySensorDefinition) ToResponse() ListEntitiesApiResponse {
 		Icon:                 B.Icon,
 		EntityCategory:       B.EntityCategory,
 	}
+}
+
+func (B BinarySensorDefinition) GetResponseType() protobuf.MsgType {
+	return protobuf.ListEntitiesBinarySensorResponseType
 }
 
 // BinarySensorState is a message to inform subscribers of updates to states
@@ -50,8 +55,4 @@ func (B BinarySensorState) ToFrame() ([]byte, protobuf.MsgType, error) {
 	}
 
 	return data, protobuf.BinarySensorStateResponseType, nil
-}
-
-func (B BinarySensorState) GetResponseType() protobuf.MsgType {
-	return protobuf.ListEntitiesBinarySensorResponseType
 }

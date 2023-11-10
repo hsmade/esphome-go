@@ -41,7 +41,8 @@ func (H ListEntities) Respond(conn net.Conn, config conf.Config) error {
 		}
 
 		slog.Debug("ListEntities:Respond: sending sensor", "sensor", response.String())
-		err = frames.Write(data, sensor.Definition.GetResponseType(), conn)
+		msgType := sensor.Definition.GetResponseType()
+		err = frames.Write(data, msgType, conn)
 		if err != nil {
 			return fmt.Errorf("failed sending ListEntitiesResponse: %w", err)
 		}

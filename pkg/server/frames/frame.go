@@ -94,35 +94,35 @@ func Read(conn net.Conn) (*Frame, error) {
 }
 
 func Write(msg []byte, msgType protobuf.MsgType, conn net.Conn) error {
-	slog.Debug("Write", "msg", fmt.Sprintf("%02x", msg), "type", msgType.String())
-	slog.Debug("Write: sending header", "data", fmt.Sprintf("%02x", 0x00))
+	slog.Debug("frame:Write", "msg", fmt.Sprintf("%02x", msg), "type", msgType.String())
+	slog.Debug("frame:Write: sending header", "data", fmt.Sprintf("%02x", 0x00))
 	_, err := conn.Write([]byte{0x00})
 	if err != nil {
 		promFrameWriteFailuresTotal.Inc()
-		return fmt.Errorf("Write: writing header: %w", err)
+		return fmt.Errorf("frame:Write: writing header: %w", err)
 	}
 
 	data := protobuf.ProtoIntVar(len(msg)).Encode()
-	slog.Debug("Write: sending size", "data", fmt.Sprintf("%02x", data))
+	slog.Debug("frame:Write: sending size", "data", fmt.Sprintf("%02x", data))
 	_, err = conn.Write(data)
 	if err != nil {
 		promFrameWriteFailuresTotal.Inc()
-		return fmt.Errorf("Write: writing Size: %w", err)
+		return fmt.Errorf("frame:Write: writing Size: %w", err)
 	}
 
 	data = protobuf.ProtoIntVar(msgType).Encode()
-	slog.Debug("Write: sending type", "data", fmt.Sprintf("%02x", data), "type", msgType)
+	slog.Debug("frame:Write: sending type", "data", fmt.Sprintf("%02x", data), "type", msgType)
 	_, err = conn.Write(data)
 	if err != nil {
 		promFrameWriteFailuresTotal.Inc()
-		return fmt.Errorf("Write: writing type: %w", err)
+		return fmt.Errorf("frame:Write: writing type: %w", err)
 	}
 	promFramesSent.WithLabelValues(msgType.String()).Inc()
 
 	_, err = conn.Write(msg)
 	if err != nil {
 		promFrameWriteFailuresTotal.Inc()
-		return fmt.Errorf("Write: writing Data: %w", err)
+		return fmt.Errorf("frame:Write: writing Data: %w", err)
 	}
 
 	return nil
