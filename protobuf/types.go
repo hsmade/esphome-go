@@ -19,10 +19,12 @@ const (
 	ListEntitiesRequestType                   MsgType = 11
 	ListEntitiesBinarySensorResponseType      MsgType = 12
 	ListEntitiesSensorResponseType            MsgType = 16
+	ListEntitiesTextSensorResponseType        MsgType = 18
 	ListEntitiesDoneResponseType              MsgType = 19
 	SubscribeStatesRequestType                MsgType = 20
 	BinarySensorStateResponseType             MsgType = 21
 	SensorStateResponseType                   MsgType = 25
+	TextSensorStateResponseType               MsgType = 27
 	SubscribeHomeassistantServicesRequestType MsgType = 34
 	HomeassistantServiceResponseType          MsgType = 35
 	SubscribeHomeAssistantStatesRequestType   MsgType = 38
@@ -65,6 +67,8 @@ func (M MsgType) String() string {
 		return "ListEntitiesBinarySensorResponse"
 	case 16:
 		return "ListEntitiesSensorResponse"
+	case 18:
+		return "ListEntitiesTextSensorResponse"
 	case 19:
 		return "ListEntitiesDoneResponse"
 	case 20:
@@ -73,6 +77,8 @@ func (M MsgType) String() string {
 		return "BinarySensorStateResponse"
 	case 25:
 		return "SensorStateResponse"
+	case 27:
+		return "TextSensorStateResponse"
 	case 34:
 		return "SubscribeHomeassistantServicesRequest"
 	case 35:
