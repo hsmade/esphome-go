@@ -1,8 +1,9 @@
 * implement rest of sensor types in conf
+* implement commands
 * implement SubscribeHomeassistantServicesRequest and SubscribeHomeAssistantStatesRequest
 * write tests
 * implement ping(er)?
-* write docs + example (cmd/server/example-server.go)
+* write docs
 * implement security:
   ```
   The API password for ESPHome is deprecated and the use of an API encryption key is recommended instead.
@@ -11,4 +12,3 @@
   ```
   https://pkg.go.dev/github.com/flynn/noise
 * refactor, refactor, refactor
-* pipeline, versioning

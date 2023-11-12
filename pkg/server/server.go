@@ -13,6 +13,7 @@ import (
 	"log/slog"
 	"net"
 	"os"
+	"sync"
 	"time"
 )
 
@@ -31,9 +32,16 @@ var (
 )
 
 type Server struct {
-	Port        int
-	Config      conf.Config
-	Subscribers []net.Conn
+	Port            int
+	Config          conf.Config
+	Subscribers     []net.Conn
+	subscribersLock sync.Mutex
+}
+
+func (S *Server) addSubscriber(conn net.Conn) {
+	S.subscribersLock.Lock()
+	defer S.subscribersLock.Unlock()
+	S.Subscribers = append(S.Subscribers, conn)
 }
 
 func (S *Server) Listen() error {
@@ -120,7 +128,7 @@ func (S *Server) handleConnection(conn net.Conn) {
 			err = messages.ListEntitiesRequest(frame).Respond(conn, S.Config)
 		case protobuf.SubscribeStatesRequestType:
 			slog.Info("adding new subscriber", "remote", conn.RemoteAddr().String())
-			S.Subscribers = append(S.Subscribers, conn) // FIXME: locking!!
+			S.addSubscriber(conn)
 		default:
 			slog.Warn("Server:handleConnection: not handling message", "type", frame.MsgType.String())
 		}
