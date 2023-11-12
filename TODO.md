@@ -1,4 +1,4 @@
-* implement rest of sensors in conf
+* implement rest of sensor types in conf
 * implement SubscribeHomeassistantServicesRequest and SubscribeHomeAssistantStatesRequest
 * write tests
 * implement ping(er)?
