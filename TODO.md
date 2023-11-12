@@ -1,4 +1,4 @@
-* implement rest of sensors through conf
+* implement rest of sensors in conf
 * implement SubscribeHomeassistantServicesRequest and SubscribeHomeAssistantStatesRequest
 * write tests
 * implement ping(er)?
@@ -11,3 +11,4 @@
   ```
   https://pkg.go.dev/github.com/flynn/noise
 * refactor, refactor, refactor
+* pipeline, versioning
