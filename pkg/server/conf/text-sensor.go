@@ -46,7 +46,7 @@ func (B TextSensorState) ToFrame() ([]byte, protobuf.MsgType, error) {
 		State:        B.State,
 		MissingState: B.MissingState,
 	}
-	slog.Debug("TextSensorState:ToFrame generating data", "message", fmt.Sprintf("%+v", message))
+	slog.Debug("TextSensorState:ToFrame generating data", "message", fmt.Sprintf("%+v", &message))
 	data, err := proto.Marshal(&message)
 	if err != nil {
 		return nil, 0, fmt.Errorf("TextSensorState:ToFrame: marshalling `TextSensorStateResponse`: %w", err)

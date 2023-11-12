@@ -48,7 +48,7 @@ func (B BinarySensorState) ToFrame() ([]byte, protobuf.MsgType, error) {
 		State:        B.State,
 		MissingState: B.MissingState,
 	}
-	slog.Debug("BinarySensorState:ToFrame generating data", "message", fmt.Sprintf("%+v", message))
+	slog.Debug("BinarySensorState:ToFrame generating data", "message", fmt.Sprintf("%+v", &message))
 	data, err := proto.Marshal(&message)
 	if err != nil {
 		return nil, 0, fmt.Errorf("BinarySensorState:ToFrame: marshalling `BinarySensorStateResponse`: %w", err)
