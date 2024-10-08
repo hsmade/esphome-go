@@ -1,10 +1,12 @@
 module github.com/hsmade/esphome-go
 
-go 1.19
+go 1.21
+
+toolchain go1.23.2
 
 require (
 	github.com/prometheus/client_golang v1.17.0
-	google.golang.org/protobuf v1.31.0
+	google.golang.org/protobuf v1.35.1
 )
 
 require (
