@@ -3,18 +3,19 @@ package server
 import (
 	"errors"
 	"fmt"
-	"github.com/hsmade/esphome-go/pkg/server/conf"
-	"github.com/hsmade/esphome-go/pkg/server/frames"
-	"github.com/hsmade/esphome-go/pkg/server/messages"
-	"github.com/hsmade/esphome-go/protobuf"
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promauto"
 	"io"
 	"log/slog"
 	"net"
 	"os"
 	"sync"
 	"time"
+
+	"github.com/hsmade/esphome-go/pkg/server/conf"
+	"github.com/hsmade/esphome-go/pkg/server/frames"
+	"github.com/hsmade/esphome-go/pkg/server/messages"
+	"github.com/hsmade/esphome-go/protobuf"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
 )
 
 var (
@@ -32,6 +33,7 @@ var (
 )
 
 type Server struct {
+	Address         string
 	Port            int
 	Config          conf.Config
 	Subscribers     []net.Conn
@@ -45,8 +47,8 @@ func (S *Server) addSubscriber(conn net.Conn) {
 }
 
 func (S *Server) Listen() error {
-	slog.Info("starting server", "port", S.Port)
-	l, err := net.Listen("tcp4", fmt.Sprintf(":%d", S.Port))
+	slog.Info("starting server", "address", S.Address, "port", S.Port)
+	l, err := net.Listen("tcp", fmt.Sprintf("%s:%d", S.Address, S.Port))
 	if err != nil {
 		return fmt.Errorf("starting listener: %w", err)
 	}
